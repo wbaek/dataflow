@@ -51,4 +51,5 @@ if __name__ == '__main__':
             a = pred.eq(labels.data.view_as(pred)).cpu().sum() / 128.0
             step += 1
 
-        print('epoch:{:02d}, step:{:06d}, loss:{:.3f}, accuracy:{:.3f}'.format(epoch, step, l, a))
+            if step % 100 == 0:
+                print('epoch:{:02d}, step:{:06d}, loss:{:.3f}, accuracy:{:.3f}'.format(epoch, step, l, a))
