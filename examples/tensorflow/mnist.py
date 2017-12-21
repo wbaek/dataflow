@@ -41,5 +41,5 @@ if __name__ == '__main__':
                 _, step, l, a = sess.run([train_op, global_step, cross_entropy, accuracy],
                                          feed_dict={x: images, y_: labels})
 
-            if step % 100 == 0:
-                print('epoch:{:02d}, step:{:06d}, loss:{:.3f}, accuracy:{:.3f}'.format(epoch, step, l, a))
+                if step % 100 == 0:
+                    print('epoch:{:02d}, step:{:06d}, loss:{:.3f}, accuracy:{:.3f}'.format(epoch, step, l, a))

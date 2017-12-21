@@ -3,7 +3,7 @@ import tensorpack.dataflow as df
 import cv2
 
 if __name__ == '__main__':
-    ds = df.dataset.Cifar10('train')
+    ds = df.dataset.Mnist('train')
     augmentors_variation = [
         df.imgaug.RandomApplyAug(df.imgaug.RandomResize((0.8, 1.2), (0.8, 1.2)), 0.5),
         df.imgaug.RandomApplyAug(df.imgaug.RotationAndCropValid(30), 0.5),
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     ]
     augmentors_default = [
         df.imgaug.Resize((32, 32)),
-        df.imgaug.MapImage(lambda x: x.reshape(32, 32, 3))
+        df.imgaug.MapImage(lambda x: x.reshape(32, 32, 1))
     ]
     # keep original image at index 1
     ds = df.MapData(ds, lambda datapoint: [datapoint[0], datapoint[0]] + datapoint[1:])
