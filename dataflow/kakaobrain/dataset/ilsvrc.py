@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ILSVRC12(RNGDataFlow):
-    def __init__(self, service_code, train_or_test, shuffle=True):
+    def __init__(self, service_code, train_or_valid, shuffle=True):
         self.base_path = 'http://twg.kakaocdn.net/{}/imagenet/ILSVRC/2012/object_localization/ILSVRC/'.format(service_code)
         data_path = os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/../../../datas/ILSVRC/classification')
         temp_map = json.load(open(data_path+'/imagenet1000_classid_to_text_synsetid.json'))
@@ -20,15 +20,18 @@ class ILSVRC12(RNGDataFlow):
             'synset2idx': {value['id']:int(key) for key, value in iter(temp_map.items())},
             'idx2text':   {int(key):value['text'] for key, value in iter(temp_map.items())}
         }
-        if train_or_test == 'train':
-            pass
+        if train_or_valid in ['train', 'training']:
+            _ = [line.decode('utf-8').split(' ')[0]
+                for line in requests.get(self.base_path + 'ImageSets/CLS-LOC/train_cls.txt').content.splitlines() if line]
+            self.datapoints = [['Data/CLS-LOC/train/'+line+'.JPEG', self.maps['synset2idx'][line.split('/')[0]]]
+                for line in _]
+        elif train_or_valid in ['valid', 'validation']:
+            synsets = [line.strip()
+                for line in open(data_path+'/imagenet_2012_validation_synset_labels.txt').readlines()]
+            self.datapoints = [['Data/CLS-LOC/val/ILSVRC2012_val_%08d.JPEG'%(i+1), self.maps['synset2idx'][synset]]
+                for i, synset in enumerate(synsets)]
         else:
-            raise NotImplementedError('currently support only train')
-
-        _ = [line.decode('utf-8').split(' ')[0]
-            for line in requests.get(self.base_path + 'ImageSets/CLS-LOC/train_cls.txt').content.splitlines() if line]
-        self.datapoints = [['Data/CLS-LOC/train/'+line+'.JPEG', self.maps['synset2idx'][line.split('/')[0]]]
-            for line in _]
+            raise ValueError('train_or_valid=%s is invalid argument must be a set train or valid'%train_or_valid)
         self.shuffle = shuffle
         
     def size(self):
@@ -78,12 +81,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Imagenet Dataset on Kakao Example')
     parser.add_argument('--service-code', type=str, required=True,
                         help='licence key')
+    parser.add_argument('--name', type=str, default='train',
+                        help='train or valid')
     args = parser.parse_args()
 
-    ds = ILSVRC12(args.service_code, 'train')
-    ds = df.PrefetchData(ds, 5000, 1)
+    ds = ILSVRC12(args.service_code, args.name)
+    ds = df.PrefetchData(ds, 5000, nr_proc=1)
     ds = df.MultiThreadMapData(ds, nr_thread=16, map_func=ILSVRC12.map_func_download)
     ds = df.MapData(ds, func=ILSVRC12.map_func_decode)
-    ds = df.PrefetchDataZMQ(ds, nr_proc=2)
+    if args.name in ['train', 'training']:
+        ds = df.PrefetchDataZMQ(ds, nr_proc=2)
     
     df.TestDataSpeed(ds, size=5000).start()
