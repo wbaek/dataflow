@@ -48,6 +48,20 @@ class ILSVRC12(RNGDataFlow):
                 logger.warning('request failed error=%s url=%s' % (str(e), url))
         return None
 
+    @staticmethod
+    def map_func_download(datapoint):
+        content = ILSVRC12.read(datapoint[0])
+        return [content] + datapoint[1:]
+
+    @staticmethod
+    def func_decode(img_binary):
+        cv2.imdecode(np.fromstring(img_binary, dtype=np.uint8), cv2.IMREAD_COLOR)
+
+    @staticmethod
+    def map_func_decode(datapoint):        
+        img = cv2.imdecode(np.fromstring(datapoint[0], dtype=np.uint8), cv2.IMREAD_COLOR)
+        return [img] + datapoint[1:]
+
     def get_data(self):
         idxs = np.arange(len(self.datapoints))
         if self.shuffle:
@@ -56,9 +70,7 @@ class ILSVRC12(RNGDataFlow):
         for i, k in enumerate(idxs):
             dp = self.datapoints[k]
             url = self.base_path + dp[0]
-            content = ILSVRC12.read(url)
-            img = cv2.imdecode(np.fromstring(content, dtype=np.uint8), cv2.IMREAD_COLOR)
-            yield [img] + dp[1:]
+            yield [url] + dp[1:]
 
 
 if __name__ == '__main__':
@@ -69,7 +81,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ds = ILSVRC12(args.service_code, 'train')
-    #ds = df.MultiThreadMapData(ds, nr_thread=2, map_func=lambda x: x)
-    ds = df.PrefetchData(ds, nr_prefetch=32, nr_proc=8)
+    ds = df.PrefetchData(ds, 5000, 1)
+    ds = df.MultiThreadMapData(ds, nr_thread=16, map_func=ILSVRC12.map_func_download)
+    ds = df.MapData(ds, func=ILSVRC12.map_func_decode)
+    ds = df.PrefetchDataZMQ(ds, nr_proc=2)
     
     df.TestDataSpeed(ds, size=5000).start()
