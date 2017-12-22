@@ -10,10 +10,10 @@ from tensorpack.dataflow.base import RNGDataFlow
 import logging
 logger = logging.getLogger(__name__)
 
-class ImagenetKakao(RNGDataFlow):
+class ILSVRC12(RNGDataFlow):
     def __init__(self, service_code, train_or_test, shuffle=True):
         self.base_path = 'http://twg.kakaocdn.net/{}/imagenet/ILSVRC/2012/object_localization/ILSVRC/'.format(service_code)
-        data_path = os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/../../datas/ILSVRC/classification')
+        data_path = os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + '/../../../datas/ILSVRC/classification')
         temp_map = json.load(open(data_path+'/imagenet1000_classid_to_text_synsetid.json'))
         self.maps = {
             'idx2synset': {int(key):value['id'] for key, value in iter(temp_map.items())},
@@ -45,7 +45,7 @@ class ImagenetKakao(RNGDataFlow):
                      continue
                 return resp.content
             except Exception as e:
-                ogger.warning('request failed error=%s url=%s' % (str(e), url))
+                logger.warning('request failed error=%s url=%s' % (str(e), url))
         return None
 
     def get_data(self):
@@ -56,7 +56,7 @@ class ImagenetKakao(RNGDataFlow):
         for i, k in enumerate(idxs):
             dp = self.datapoints[k]
             url = self.base_path + dp[0]
-            content = ImagenetKakao.read(url)
+            content = ILSVRC12.read(url)
             img = cv2.imdecode(np.fromstring(content, dtype=np.uint8), cv2.IMREAD_COLOR)
             yield [img] + dp[1:]
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
                         help='licence key')
     args = parser.parse_args()
 
-    ds = ImagenetKakao(args.service_code, 'train')
+    ds = ILSVRC12(args.service_code, 'train')
     #ds = df.MultiThreadMapData(ds, nr_thread=2, map_func=lambda x: x)
     ds = df.PrefetchData(ds, nr_prefetch=32, nr_proc=8)
     
