@@ -12,4 +12,8 @@ http://download.pytorch.org/whl/cu80/torch-0.3.0.post4-cp36-cp36m-linux_x86_64.w
 http://download.pytorch.org/whl/cu80/torch-0.3.0.post4-cp27-cp27mu-linux_x86_64.whl ; python_version < '2.8' and sys_platform=='linux2'
 torchvision
 
+ujson
+requests
+grequests
+
 pytest
