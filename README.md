@@ -9,6 +9,20 @@ data feeder using [tensorpack.dataflow](http://tensorpack.readthedocs.io/en/late
 > -- http://tensorpack.readthedocs.io/en/latest/tutorial/dataflow.html
 
 ## Examples
+* ILSVRC12 multi threaded download with multi processed preprocessing
+```
+from dataflow.kakaobrain.dataset.ilsvrc import ILSVRC12
+
+ds = ILSVRC12('braincloud', 'train', shuffle=True)
+ds = df.MultiThreadMapData(ds, nr_thread=16, map_func=ILSVRC12.map_func_download)
+ds = df.MapData(ds, func=ILSVRC12.map_func_decode)
+ds = df.PrefetchDataZMQ(ds, nr_proc=8)
+
+for datapoint in ds.get_data():
+    pass
+```
+
+## Original Dataflow Examples
 
 ### Basic Dataflow
 * [Mnist Preprocessing](https://github.com/wbaek/dataflow/blob/master/examples/tensorpack/mnist.py)
