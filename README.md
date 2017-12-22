@@ -13,7 +13,8 @@ data feeder using [tensorpack.dataflow](http://tensorpack.readthedocs.io/en/late
 ```
 from dataflow.kakaobrain.dataset.ilsvrc import ILSVRC12
 
-ds = ILSVRC12('braincloud', 'train', shuffle=True)
+service_code = 'CONTACT_ME'
+ds = ILSVRC12(service_code, 'train', shuffle=True)
 ds = df.MultiThreadMapData(ds, nr_thread=16, map_func=ILSVRC12.map_func_download)
 ds = df.MapData(ds, func=ILSVRC12.map_func_decode)
 ds = df.PrefetchDataZMQ(ds, nr_proc=8)
