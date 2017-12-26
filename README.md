@@ -30,7 +30,7 @@ for datapoint in ds.get_data():
     pass
 ```
 
-* ILSVRC12 multi threaded downloading with multi processed preprocessing
+* ILSVRC12 **multi threaded** downloading with **multi processed** preprocessing
 ```python
 import tensorpack.dataflow as df
 from dataflow.dataset import ILSVRC12
