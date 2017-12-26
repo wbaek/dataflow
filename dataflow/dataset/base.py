@@ -70,6 +70,6 @@ class NetworkImages(RNGDataFlow):
         ds = df.MultiThreadMapData(ds,
                                    nr_thread=num_threads, map_func=NetworkImages.map_func_download,
                                    buffer_size=buffer_size, strict=strict)
-        ds = df.PrefetchDataZMQ(ds, nr_proc=1)  # to reduce GIL contention.
+        # ds = df.PrefetchDataZMQ(ds, nr_proc=1)  # to reduce GIL contention.
         ds = df.MapData(ds, func=NetworkImages.map_func_decode)
         return ds

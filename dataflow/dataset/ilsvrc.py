@@ -55,7 +55,7 @@ if __name__ == '__main__':
                         help='train or valid')
     args = parser.parse_args()
 
-    ds = ILSVRC12(args.service_code, args.name).parallel(num_threads=8)
+    ds = ILSVRC12(args.service_code, args.name).parallel(num_threads=32)
     if args.name in ['train', 'training']:
         ds = df.PrefetchDataZMQ(ds, nr_proc=2)
     
