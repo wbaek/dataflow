@@ -2,7 +2,7 @@ from dataflow.dataset.ilsvrc import ILSVRC12
 
 import pytest
 import numpy as np
-import tensorpack.dataflow as df
+
 
 def test_ilsvrc12_train_get_data():
     ds = ILSVRC12('braincloud', 'train', shuffle=False)
@@ -16,6 +16,7 @@ def test_ilsvrc12_train_get_data():
         assert np.max(dp[0]) == 255
         assert dp[0].shape == (250, 250, 3)
         break
+
 
 def test_ilsvrc12_train_get_data_shuffled():
     ds = ILSVRC12('braincloud', 'train', shuffle=True)
@@ -31,6 +32,7 @@ def test_ilsvrc12_train_get_data_shuffled():
         if idx > 3:
             break
 
+
 def test_ilsvrc12_valid_get_data():
     ds = ILSVRC12('braincloud', 'valid', shuffle=False)
     assert ds.size() == 50000
@@ -43,6 +45,7 @@ def test_ilsvrc12_valid_get_data():
         assert np.max(dp[0]) == 255
         assert dp[0].shape == (375, 500, 3)
         break
+
 
 def test_ilsvrc12_valid_get_data_shuffled():
     ds = ILSVRC12('braincloud', 'valid', shuffle=True)
@@ -58,10 +61,12 @@ def test_ilsvrc12_valid_get_data_shuffled():
         if idx > 3:
             break
 
+
 def test_ilsvrc12_invalid_name():
     with pytest.raises(ValueError) as excinfo:
-        ds = ILSVRC12('braincloud', 'invalid')
+        ILSVRC12('braincloud', 'invalid')
     assert 'train_or_valid=invalid is invalid argument must be a set train or valid' == str(excinfo.value)
+
 
 def test_ilsvrc12_train_partitioning():
     ds = ILSVRC12('braincloud', 'train', shuffle=False).partitioning(10, 0)
@@ -114,5 +119,3 @@ def test_ilsvrc12_train_parallel():
         if index >= 10:
             break
         index += 1
-
-

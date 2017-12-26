@@ -10,7 +10,7 @@ data feeder using [tensorpack.dataflow](http://tensorpack.readthedocs.io/en/late
 
 ## Examples
 * General network images
-```
+```pytho
 from dataflow.dataset import NetworkImages
 
 class NetworkImagesImple(NetworkImages):
@@ -31,7 +31,8 @@ for datapoint in ds.get_data():
 ```
 
 * ILSVRC12 multi threaded downloading with multi processed preprocessing
-```
+```python
+import tensorpack.dataflow as df
 from dataflow.dataset import ILSVRC12
 
 service_code = 'CONTACT_ME'
