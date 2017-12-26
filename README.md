@@ -9,14 +9,33 @@ data feeder using [tensorpack.dataflow](http://tensorpack.readthedocs.io/en/late
 > -- http://tensorpack.readthedocs.io/en/latest/tutorial/dataflow.html
 
 ## Examples
-* ILSVRC12 multi threaded download with multi processed preprocessing
+* General network images
 ```
-from dataflow.kakaobrain.dataset.ilsvrc import ILSVRC12
+from dataflow.dataset import NetworkImages
+
+class NetworkImagesImple(NetworkImages):
+    def __init__(self, shuffle=False):
+        super(NetworkImagesImple, self).__init__(shuffle)
+        self.datapoints = [
+            ['http://t1.daumcdn.net/news/201511/20/sportskhan/20151120010041631lkva.jpg', 0],
+            ['http://t1.daumcdn.net/news/201511/03/SpoChosun/20151103111905902jtmo.jpg',  1],
+            ['http://t1.daumcdn.net/news/201712/26/ked/20171226081404015hktd.jpg',        2],
+            ['http://t1.daumcdn.net/news/201511/05/10asia/20151105173913995tqqc.jpg',     3],
+            ['http://t1.daumcdn.net/news/201607/20/etimesi/20160720112503626xuwr.jpg',    4],
+        ]
+
+ds = NetworkImagesImple()
+
+for datapoint in ds.get_data():
+    pass
+```
+
+* ILSVRC12 multi threaded downloading with multi processed preprocessing
+```
+from dataflow.dataset import ILSVRC12
 
 service_code = 'CONTACT_ME'
-ds = ILSVRC12(service_code, 'train', shuffle=True)
-ds = df.MultiThreadMapData(ds, nr_thread=16, map_func=ILSVRC12.map_func_download)
-ds = df.MapData(ds, func=ILSVRC12.map_func_decode)
+ds = ILSVRC12(service_code, 'train', shuffle=True).parallel(num_threads=16)
 ds = df.PrefetchDataZMQ(ds, nr_proc=8)
 
 for datapoint in ds.get_data():
