@@ -21,18 +21,21 @@ class ILSVRC12(NetworkImages):
             'idx2text':   {int(key): value['text'] for key, value in iter(temp_map.items())}
         }
         if train_or_valid in ['train', 'training']:
-            _ = [line.decode('utf-8').split(' ')[0]
-                 for line in
-                 requests.get(base_path + 'ImageSets/CLS-LOC/train_cls.txt').content.splitlines() if line]
+            _ = [
+                line.decode('utf-8').strip().split(' ')[0]
+                for line in requests.get(base_path + 'ImageSets/CLS-LOC/train_cls.txt').content.splitlines()
+                if line.strip()
+            ]
+
             self.datapoints = [
                 [base_path + 'Data/CLS-LOC/train/'+line+'.JPEG', int(self.maps['synset2idx'][line.split('/')[0]])]
-                for line in
-                _
+                for line in _
             ]
         elif train_or_valid in ['valid', 'validation']:
-            synsets = [line.strip()
-                       for line in
-                       open(data_path+'/imagenet_2012_validation_synset_labels.txt').readlines()]
+            synsets = [
+                line.strip()
+                for line in open(data_path+'/imagenet_2012_validation_synset_labels.txt').readlines()
+            ]
             self.datapoints = [
                 [base_path + 'Data/CLS-LOC/val/ILSVRC2012_val_%08d.JPEG' % (i+1), int(self.maps['synset2idx'][synset])]
                 for i, synset in enumerate(synsets)
