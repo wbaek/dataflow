@@ -5,6 +5,8 @@ import logging
 import tensorpack.dataflow as df
 import dataflow
 
+from imagenet_utils import fbresnet_augmentor
+
 if __name__ == '__main__':
     import argparse
 
@@ -13,6 +15,7 @@ if __name__ == '__main__':
                         help='licence key')
     parser.add_argument('-t', '--threads', type=int, default=16)
     parser.add_argument('-p', '--process', type=int, default=2)
+    parser.add_argument('--augment', action='store_true')
     parser.add_argument('--view', action='store_true')
     parser.add_argument('--log-filename',   type=str,   default='')
     args = parser.parse_args()
@@ -23,12 +26,15 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO, format='[%(asctime)s %(levelname)s] %(message)s', filename=args.log_filename)
 
-    augmentors = [
-        df.imgaug.Resize((128, 128)),
-    ]
+    if args.augment:
+        augmentors = fbresnet_augmentor(isTrain=True)
+    else:
+        augmentors = [
+            df.imgaug.Resize((128, 128)),
+        ]
 
     ds = dataflow.dataset.ILSVRC12(args.service_code, 'train', shuffle=True).parallel(num_threads=args.threads)
-    ds = df.AugmentImageComponent(ds, augmentors)
+    ds = df.AugmentImageComponent(ds, augmentors, copy=False)
     ds = df.PrefetchDataZMQ(ds, nr_proc=args.process)
     if args.view:
         ds = dataflow.utils.image.Viewer(ds, lambda x: x[1] == 4,  'label-4',  prob=1.0, pos=(0, (128+64)*0))
