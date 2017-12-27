@@ -27,7 +27,7 @@ class NetworkImages(RNGDataFlow):
         for trial in range(max_trials):
             try:
                 resp = requests.get(url)
-                if resp.status_code // 100 != 2:
+                if resp.status_code // 100 != 2 or len(resp.content) == 0:
                     logger.warning('request failed http status code=%d url=%s' % (resp.status_code, url))
                     time.sleep(0.05)
                     continue
