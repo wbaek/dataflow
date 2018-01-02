@@ -1,0 +1,12 @@
+
+http://download.pytorch.org/whl/torch-0.3.0.post4-cp36-cp36m-macosx_10_7_x86_64.whl; python_vers
+ion > '3.5' and sys_platform=='darwin'
+http://download.pytorch.org/whl/torch-0.3.0.post4-cp27-none-macosx_10_6_x86_64.whl; python_versi
+on < '2.8' and sys_platform=='darwin'
+http://download.pytorch.org/whl/cu80/torch-0.3.0.post4-cp36-cp36m-linux_x86_64.whl; python_versi
+on > '3.5' and sys_platform=='linux2'
+http://download.pytorch.org/whl/cu80/torch-0.3.0.post4-cp27-cp27mu-linux_x86_64.whl ; python_ver
+sion < '2.8' and sys_platform=='linux2'
+torchvision
+
+gym[atari]
