@@ -65,11 +65,12 @@ for datapoint in ds.get_data():
 ### pre-requirements
 * ubuntu
 ```
-apt install -y libsm6 libxext-dev
+apt install -y libsm6 libxext-dev cmake
 ```
 
 * mac
 ```
+brew install cmake
 ```
 
 * commons
