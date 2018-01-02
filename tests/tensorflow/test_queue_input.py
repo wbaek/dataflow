@@ -83,3 +83,22 @@ def test_queue_input_infinite():
         time.sleep(1.0)
         assert 50 == sess.run(thread.queue_size())
 
+def test_queue_input_multi_threads():
+    threads = []
+    for t in range(3): 
+        ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
+        ds.reset_state()
+
+        placeholders = [tf.placeholder(tf.float32, shape=()), tf.placeholder(tf.float32, shape=())]
+        thread = QueueInput(ds, placeholders, repeat_infinite=True)
+        threads.append(thread)
+
+    with tf.Session() as sess:
+        for thread in threads:
+            thread.start()
+
+        for i in range(10):
+            dp = sess.run([t.tensors() for t in threads])
+            assert [[i*1.0, (10-i)*1.0]] * 3
+
+
