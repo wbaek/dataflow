@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class Viewer(ProxyDataFlow):
-    def __init__(self, ds, condition=lambda x: x[1] is 0, name='label-0', prob=0.1, pos=(0,0)):
+    def __init__(self, ds, condition=lambda x: x[1] is 0, name='label-0', prob=0.1, pos=(0, 0)):
         super(Viewer, self).__init__(ds)
         self.condition = condition
         self.name = name
@@ -26,4 +26,3 @@ class Viewer(ProxyDataFlow):
 
             if dp is not None:
                 yield dp
-        

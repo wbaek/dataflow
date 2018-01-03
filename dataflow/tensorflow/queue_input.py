@@ -7,6 +7,7 @@ import tensorpack.dataflow as df
 import logging
 logger = logging.getLogger(__name__)
 
+
 class QueueInput(threading.Thread):
     def __init__(self, ds, placeholders, repeat_infinite=False, queue_size=50):
         super(QueueInput, self).__init__()
@@ -22,6 +23,8 @@ class QueueInput(threading.Thread):
         self.op = self.queue.enqueue(self.placeholders)
         self.close_op = self.queue.close(cancel_pending_enqueues=True)
 
+        self._itr = None
+        self._sess = None
         self._lock = threading.Lock()
 
     def run(self):
@@ -74,10 +77,9 @@ class QueueInput(threading.Thread):
             with self._sess.as_default():
                 yield
         else:
-            logger.warn("QueueInput {} wasn't under a default session!".format(self.name))
+            logger.warning("QueueInput {} wasn't under a default session!".format(self.name))
             yield
 
     def start(self):
-        import tensorflow as tf
         self._sess = tf.get_default_session()
         super(QueueInput, self).start()

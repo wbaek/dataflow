@@ -16,6 +16,7 @@ def test_testdata():
         assert 10-index == dp[1]
         index += 1
 
+
 def test_queue_input():
     ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
     ds.reset_state()
@@ -33,6 +34,7 @@ def test_queue_input():
             assert i*2.0 == dp[0]
             assert (10-i)*2.0 == dp[1]
 
+
 def test_queue_input_terminated():
     ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
     ds.reset_state()
@@ -46,10 +48,11 @@ def test_queue_input_terminated():
         thread.start()
 
         for i in range(10):
-            dp = sess.run(tensors)
+            _ = sess.run(tensors)
 
         with pytest.raises(tf.errors.OutOfRangeError) as excinfo:
             sess.run(tensors)
+
 
 def test_queue_input_infinite():
     ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
@@ -64,7 +67,8 @@ def test_queue_input_infinite():
         thread.start()
 
         for i in range(30):
-            dp = sess.run(tensors)
+            _ = sess.run(tensors)
+
 
 def test_queue_input_infinite():
     ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
@@ -73,15 +77,14 @@ def test_queue_input_infinite():
     placeholders = [tf.placeholder(tf.float32, shape=()), tf.placeholder(tf.float32, shape=())]
     thread = QueueInput(ds, placeholders, repeat_infinite=True, queue_size=50)
 
-    tensors = [2.0*ph for ph in thread.tensors()]
-
     with tf.Session() as sess:
-        assert 0 ==  sess.run(thread.queue_size())
+        assert 0 == sess.run(thread.queue_size())
         thread.start()
 
         assert 0 < sess.run(thread.queue_size())
         time.sleep(1.0)
         assert 50 == sess.run(thread.queue_size())
+
 
 def test_queue_input_multi_threads():
     threads = []
@@ -99,6 +102,4 @@ def test_queue_input_multi_threads():
 
         for i in range(10):
             dp = sess.run([t.tensors() for t in threads])
-            assert [[i*1.0, (10-i)*1.0]] * 3
-
-
+            assert [[i*1.0, (10-i)*1.0]] * 3 == dp
