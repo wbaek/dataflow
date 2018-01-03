@@ -27,7 +27,43 @@ def test_queue_input():
     tensors = [2.0*ph for ph in thread.tensors()]
 
     with tf.Session() as sess:
-        thread.start()
+        thread.start(sess)
+
+        for i in range(10):
+            dp = sess.run(tensors)
+            assert i*2.0 == dp[0]
+            assert (10-i)*2.0 == dp[1]
+
+
+def test_queue_input_singular_monitored_session():
+    ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
+    ds.reset_state()
+
+    placeholders = [tf.placeholder(tf.float32, shape=()), tf.placeholder(tf.float32, shape=())]
+    thread = QueueInput(ds, placeholders)
+
+    tensors = [2.0*ph for ph in thread.tensors()]
+
+    with tf.train.SingularMonitoredSession() as sess:
+        thread.start(sess)
+
+        for i in range(10):
+            dp = sess.run(tensors)
+            assert i*2.0 == dp[0]
+            assert (10-i)*2.0 == dp[1]
+
+
+def test_queue_input_monitored_session():
+    ds = df.DataFromList(list(zip(range(10), range(10, 0, -1))), shuffle=False)
+    ds.reset_state()
+
+    placeholders = [tf.placeholder(tf.float32, shape=()), tf.placeholder(tf.float32, shape=())]
+    thread = QueueInput(ds, placeholders)
+
+    tensors = [2.0*ph for ph in thread.tensors()]
+
+    with tf.train.MonitoredTrainingSession() as sess:
+        thread.start(sess)
 
         for i in range(10):
             dp = sess.run(tensors)
@@ -45,7 +81,7 @@ def test_queue_input_terminated():
     tensors = [2.0*ph for ph in thread.tensors()]
 
     with tf.Session() as sess:
-        thread.start()
+        thread.start(sess)
 
         for i in range(10):
             _ = sess.run(tensors)
@@ -64,7 +100,7 @@ def test_queue_input_infinite():
     tensors = [2.0*ph for ph in thread.tensors()]
 
     with tf.Session() as sess:
-        thread.start()
+        thread.start(sess)
 
         for i in range(30):
             _ = sess.run(tensors)
@@ -79,7 +115,7 @@ def test_queue_input_infinite():
 
     with tf.Session() as sess:
         assert 0 == sess.run(thread.queue_size())
-        thread.start()
+        thread.start(sess)
 
         assert 0 < sess.run(thread.queue_size())
         time.sleep(1.0)
@@ -98,7 +134,7 @@ def test_queue_input_multi_threads():
 
     with tf.Session() as sess:
         for thread in threads:
-            thread.start()
+            thread.start(sess)
 
         for i in range(10):
             dp = sess.run([t.tensors() for t in threads])

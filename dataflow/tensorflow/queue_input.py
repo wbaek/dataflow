@@ -3,6 +3,7 @@ from contextlib import contextmanager
 
 import tensorflow as tf
 import tensorpack.dataflow as df
+from tensorflow.python.training.monitored_session import _MonitoredSession
 
 import logging
 logger = logging.getLogger(__name__)
@@ -80,6 +81,6 @@ class QueueInput(threading.Thread):
             logger.warning("QueueInput {} wasn't under a default session!".format(self.name))
             yield
 
-    def start(self):
-        self._sess = tf.get_default_session()
+    def start(self, session):
+        self._sess = session._tf_sess() if isinstance(session, _MonitoredSession) else session
         super(QueueInput, self).start()
