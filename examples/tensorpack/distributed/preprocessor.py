@@ -16,6 +16,6 @@ if __name__ == '__main__':
     ds = df.AugmentImageComponent(ds, augmentors)
     ds = df.BatchData(ds, batch_size=32, remainder=False)
     ds = df.PrefetchData(ds, nr_prefetch=12, nr_proc=2)
-    ds = df.PrintData(ds)
+    #ds = df.PrintData(ds)
 
     df.send_dataflow_zmq(ds, 'tcp://localhost:2222')

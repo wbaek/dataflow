@@ -76,7 +76,9 @@ brew install cmake
 * commons
 ```
 pip install -r requirements.txt
+export TENSORPACK_DATASET=/data/private/storage/tensorpack_data
 ```
+
 
 
 ## Benchmark
